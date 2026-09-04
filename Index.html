@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منيو المطعم التفاعلي</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font (Cairo) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+          colors: {
+            gold: '#FFD700',
+            hotOrange: '#FF4500',
+          },
+          boxShadow: {
+            'gold-glow': '0 0 15px rgba(255, 215, 0, 0.6), 0 0 5px rgba(255, 215, 0, 0.4)',
+            'orange-glow': '0 0 15px rgba(255, 69, 0, 0.8), 0 0 5px rgba(255, 69, 0, 0.5)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s, color 0.3s; }
+    
+    /* Light Mode Borders & Glow */
+    .light .img-glow-border {
+      border: 3px solid #FFD700;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.7);
+    }
+
+    /* Night Mode Borders & Glow */
+    .dark .img-glow-border {
+      border: 3px solid #FF4500;
+      box-shadow: 0 0 12px rgba(255, 69, 0, 0.8);
+    }
+  </style>
+</head>
+<body class="bg-white dark:bg-black text-gray-900 dark:text-gray-100 min-h-screen pb-28">
+
+  <!-- Floating Theme Switcher Button -->
+  <button id="themeToggleBtn" onclick="toggleTheme()" class="fixed top-4 left-4 z-50 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 p-3 rounded-full shadow-lg transition-transform active:scale-95">
+    <i id="themeIcon" class="fa-solid fa-moon text-xl"></i>
+  </button>
+
+  <!-- 1. Hero Section -->
+  <header class="relative">
+    <!-- Cover Banner -->
+    <div class="h-48 md:h-64 w-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80');">
+      <div class="w-full h-full bg-black/40"></div>
+    </div>
+
+    <!-- Header Info Box -->
+    <div class="max-w-4xl mx-auto px-4 relative">
+      <div class="flex flex-col md:flex-row items-center md:items-end justify-between -mt-16 mb-4 gap-4">
+        
+        <!-- Logo & Name (Right Aligned Overlay) -->
+        <div class="flex items-center gap-4 w-full md:w-auto">
+          <!-- Circular Logo -->
+          <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80" alt="شعار المطعم" class="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover img-glow-border z-10 bg-white dark:bg-black">
+          
+          <div class="mt-12 md:mt-0">
+            <h1 class="text-2xl md:text-3xl font-extrabold">مطعم السفير الفاخر</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">أطيب المأكولات الشرقية والغربية</p>
+          </div>
+        </div>
+
+        <!-- Social Media Links -->
+        <div class="flex items-center gap-3 self-center md:self-end">
+          <a href="#" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-amber-500 hover:scale-110 transition-transform"><i class="fa-brands fa-instagram text-xl"></i></a>
+          <a href="#" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform"><i class="fa-brands fa-facebook text-xl"></i></a>
+          <a href="#" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-green-500 hover:scale-110 transition-transform"><i class="fa-brands fa-whatsapp text-xl"></i></a>
+          <a href="#" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-red-500 hover:scale-110 transition-transform"><i class="fa-solid fa-location-dot text-xl"></i></a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Menu Section -->
+  <main class="max-w-4xl mx-auto px-4 mt-8">
+    <h2 class="text-xl font-bold mb-6 border-r-4 border-yellow-500 dark:border-orange-500 pr-3">قائمة الطعام</h2>
+
+    <div id="menuContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Items will be generated dynamically by JavaScript -->
+    </div>
+  </main>
+
+  <!-- 3. Bottom Sticky Checkout Bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 p-4 z-40">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+      <div>
+        <span class="block text-xs text-gray-500 dark:text-gray-400">المجموع الكلي:</span>
+        <span id="totalPrice" class="text-xl font-extrabold text-amber-600 dark:text-orange-500">0 $</span>
+      </div>
+      <button onclick="openModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center gap-2">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+        <span>إرسال الطلب عبر الواتساب</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 4. Modal (Popup Window) -->
+  <div id="orderModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-2xl p-6 shadow-2xl relative border border-gray-200 dark:border-gray-800">
+      
+      <!-- Close Button -->
+      <button onclick="closeModal()" class="absolute top-4 left-4 text-gray-400 hover:text-gray-600 dark:hover:text-white">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <h3 class="text-xl font-bold mb-4 text-center">تفاصيل الطلب</h3>
+
+      <!-- Order Type Tabs (Inside / Outside) -->
+      <div class="flex rounded-lg bg-gray-100 dark:bg-gray-800 p-1 mb-6">
+        <button id="tabInside" onclick="switchTab('inside')" class="flex-1 py-2 rounded-md font-bold text-sm transition-all bg-white dark:bg-black text-gray-900 dark:text-white shadow">داخل المطعم</button>
+        <button id="tabOutside" onclick="switchTab('outside')" class="flex-1 py-2 rounded-md font-bold text-sm transition-all text-gray-500 dark:text-gray-400">خارج المطعم</button>
+      </div>
+
+      <!-- Inside Restaurant Form -->
+      <form id="insideForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">اسم الزبون *</label>
+          <input type="text" id="insideName" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">رقم الطاولة *</label>
+          <input type="text" id="tableNum" required class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">ملاحظة أخرى</label>
+          <textarea id="insideNote" rows="2" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500"></textarea>
+        </div>
+      </form>
+
+      <!-- Outside Restaurant Form -->
+      <form id="outsideForm" class="space-y-4 hidden">
+        <div>
+          <label class="block text-sm font-medium mb-1">اسم الزبون *</label>
+          <input type="text" id="outsideName" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">رقم الزبون (الهاتف) *</label>
+          <input type="tel" id="outsidePhone" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">موقع / عنوان الزبون *</label>
+          <input type="text" id="outsideLocation" class="w-full px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:border-amber-500 dark:focus:border-orange-500">
+        </div>
+      </form>
+
+      <!-- Submit Order Button -->
+      <button onclick="submitOrder()" class="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-transform active:scale-95 flex items-center justify-center gap-2">
+        <i class="fa-brands fa-whatsapp text-xl"></i>
+        <span>تأكيد وإرسال عبر الواتساب</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- JavaScript Code -->
+  <script>
+    // Restaurant WhatsApp Phone Number (Change it to your number)
+    const RESTAURANT_WHATSAPP = "9647000000000"; 
+
+    // Menu Data
+    const menuItems = [
+      { id: 1, name: "وجبة برغر كلاسيك", price: 10, desc: "شريحة لحم بقر مقدد مع الجبن الصافي والصلصة الخاصة", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300&q=80" },
+      { id: 2, name: "بيتزا مارجريتا", price: 12, desc: "جبنة موزاريلا مع صلصة الطماطم الإيطالية والأوريجانو", img: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=300&q=80" },
+      { id: 3, name: "مشاوي مشكلة", price: 20, desc: "تشكيلة من كباب اللحم وشيش طاووق وقطع اللحم المشوية", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=300&q=80" },
+      { id: 4, name: "عصير برتقال طازج", price: 4, desc: "عصير برتقال طبيعي 100% بدون إضافات", img: "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=300&q=80" }
+    ];
+
+    let cart = {};
+    let orderType = 'inside'; // 'inside' or 'outside'
+
+    // Render Menu Items
+    function renderMenu() {
+      const container = document.getElementById('menuContainer');
+      container.innerHTML = menuItems.map(item => `
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 flex gap-4 items-center border border-gray-100 dark:border-gray-800 transition-all">
+          <img src="${item.img}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover img-glow-border">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg">${item.name}</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">${item.desc}</p>
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-amber-600 dark:text-orange-500">${item.price} $</span>
+              
+              <!-- Quantity Selector Controls -->
+              <div class="flex items-center gap-3 bg-gray-200 dark:bg-gray-800 rounded-lg px-2 py-1">
+                <button onclick="updateQty(${item.id}, -1)" class="text-lg font-bold w-6 h-6 flex items-center justify-center rounded-md hover:bg-gray-300 dark:hover:bg-gray-700">-</button>
+                <span id="qty-${item.id}" class="font-bold text-sm">${cart[item.id] || 0}</span>
+                <button onclick="updateQty(${item.id}, 1)" class="text-lg font-bold w-6 h-6 flex items-center justify-center rounded-md hover:bg-gray-300 dark:hover:bg-gray-700">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Update Item Quantities
+    function updateQty(id, delta) {
+      if (!cart[id]) cart[id] = 0;
+      cart[id] += delta;
+      if (cart[id] <= 0) delete cart[id];
+      
+      document.getElementById(`qty-${id}`).innerText = cart[id] || 0;
+      calculateTotal();
+    }
+
+    // Calculate Total Price
+    function calculateTotal() {
+      let total = 0;
+      for (const id in cart) {
+        const item = menuItems.find(i => i.id == id);
+        if (item) total += item.price * cart[id];
+      }
+      document.getElementById('totalPrice').innerText = `${total} $`;
+      return total;
+    }
+
+    // Theme Switcher (Light / Night Mode)
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        icon.className = "fa-solid fa-moon text-xl text-gray-800";
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        icon.className = "fa-solid fa-sun text-xl text-yellow-400";
+      }
+    }
+
+    // Modal Control
+    function openModal() {
+      if (Object.keys(cart).length === 0) {
+        alert("يرجى اختيار طبق واحد على الأقل قبل متابعة الطلب!");
+        return;
+      }
+      document.getElementById('orderModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').classList.add('hidden');
+    }
+
+    // Switch between "Inside" and "Outside" Tabs
+    function switchTab(type) {
+      orderType = type;
+      const tabInside = document.getElementById('tabInside');
+      const tabOutside = document.getElementById('tabOutside');
+      const insideForm = document.getElementById('insideForm');
+      const outsideForm = document.getElementById('outsideForm');
+
+      if (type === 'inside') {
+        tabInside.className = "flex-1 py-2 rounded-md font-bold text-sm transition-all bg-white dark:bg-black text-gray-900 dark:text-white shadow";
+        tabOutside.className = "flex-1 py-2 rounded-md font-bold text-sm transition-all text-gray-500 dark:text-gray-400";
+        insideForm.classList.remove('hidden');
+        outsideForm.classList.add('hidden');
+      } else {
+        tabOutside.className = "flex-1 py-2 rounded-md font-bold text-sm transition-all bg-white dark:bg-black text-gray-900 dark:text-white shadow";
+        tabInside.className = "flex-1 py-2 rounded-md font-bold text-sm transition-all text-gray-500 dark:text-gray-400";
+        outsideForm.classList.remove('hidden');
+        insideForm.classList.add('hidden');
+      }
+    }
+
+    // Prepare and Submit Order to WhatsApp
+    function submitOrder() {
+      let orderDetailsText = "🍽️ *طلب جديد من المنيو الإلكتروني*\n\n";
+      
+      // Order Items
+      orderDetailsText += "*الأطباق المطلوبة:*\n";
+      for (const id in cart) {
+        const item = menuItems.find(i => i.id == id);
+        orderDetailsText += `- ${item.name} (عدد: ${cart[id]}) = ${item.price * cart[id]} $\n`;
+      }
+      
+      orderDetailsText += `\n*المجموع الكلي:* ${calculateTotal()} $\n`;
+      orderDetailsText += `-----------------------------------\n`;
+
+      // Customer Info Details
+      if (orderType === 'inside') {
+        const name = document.getElementById('insideName').value;
+        const table = document.getElementById('tableNum').value;
+        const note = document.getElementById('insideNote').value;
+
+        if (!name || !table) {
+          alert("يرجى ملء جميع الحقول المطلوبة (اسم الزبون ورقم الطاولة)!");
+          return;
+        }
+
+        orderDetailsText += `*نوع الطلب:* داخل المطعم 🏢\n`;
+        orderDetailsText += `*اسم الزبون:* ${name}\n`;
+        orderDetailsText += `*رقم الطاولة:* ${table}\n`;
+        if (note) orderDetailsText += `*ملاحظات:* ${note}\n`;
+
+      } else {
+        const name = document.getElementById('outsideName').value;
+        const phone = document.getElementById('outsidePhone').value;
+        const location = document.getElementById('outsideLocation').value;
+
+        if (!name || !phone || !location) {
+          alert("يرجى ملء جميع الحقول المطلوبة لطلب التوصيل!");
+          return;
+        }
+
+        orderDetailsText += `*نوع الطلب:* خارج المطعم (توصيل) 🛵\n`;
+        orderDetailsText += `*اسم الزبون:* ${name}\n`;
+        orderDetailsText += `*رقم الهاتف:* ${phone}\n`;
+        orderDetailsText += `*العنوان/الموقع:* ${location}\n`;
+      }
+
+      // Open WhatsApp URL
+      const encodedMsg = encodeURIComponent(orderDetailsText);
+      window.open(`https://wa.me/${RESTAURANT_WHATSAPP}?text=${encodedMsg}`, '_blank');
+      closeModal();
+    }
+
+    // Initialize Menu
+    renderMenu();
+  </script>
+</body>
+</html>
